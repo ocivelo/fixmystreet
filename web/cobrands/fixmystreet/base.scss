@@ -101,6 +101,8 @@
 }
 
 #homepage-ab-test {
+  display: none; // header_extra.html will override this if Analytics tells it to
+
   a {
     display: inline-block;
     cursor: pointer;

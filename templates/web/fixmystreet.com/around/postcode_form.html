@@ -1,6 +1,4 @@
-[% extra_css = BLOCK %]
-    <link rel="stylesheet" href="[% version('/cobrands/fixmystreet.com/homepage-ab-test.css') %]">
-[% END %]
+[%# Identical to parent, but with an extra div and javascript for our homepage A/B test %]
 
 <div id="front-main">
     <div id="front-main-container">
@@ -32,11 +30,19 @@ $(function(){
   $('#homepage-ab-test a').on('click', function(e){
       e.preventDefault();
       $('#homepage-ab-test').fadeOut(250, function(){
-        $('#postcodeForm, #geolocate_link').fadeIn(250, function(){
+
+        /* fadeIn() normal form, and focus input */
+        $('#postcodeForm').fadeIn(250, function(){
           $('#pc').focus();
         });
+
+        /* Can't just fadeIn() because #geolocate_link
+           should have { display: inline-block } */
+        $('#geolocate_link').css({
+          opacity: 0,
+          display: 'inline-block'
+        }).animate({ opacity: 1 }, 250);
       });
   });
-  $('#postcodeForm, #geolocate_link').hide();
 });
 </script>
