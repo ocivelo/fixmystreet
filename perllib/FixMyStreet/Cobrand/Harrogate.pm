@@ -51,32 +51,94 @@ Can run with a script or command line like:
 sub temp_update_contacts {
     my $self = shift;
 
-    my $category = 'Potholes';
-    my $contact = $self->{c}->model('DB::Contact')
-        ->search({
+    my $contact_rs = $self->{c}->model('DB::Contact');
+
+    my $_update = sub {
+        my ($category, $field) = @_; # we're accepting just 1 field, but supply as array [ $field ]
+        my $contact = $contact_rs->search({
             body_id => $self->council_id,
             category => $category,
         })->first
-        or die "No such category: $category";
+        or do {
+            warn "No such category: $category (skipping)\n";
+            return;
+        };
 
-    my $fields = [
-        {
-            'code' => 'detail_size', # there is already builtin handling for this field in Report::New
-            'variable' => 'true',
-            'order' => '1',
-            'description' => 'Size of the pothole?',
-            'required' => 'true',
-            'datatype' => 'singlevaluelist',
-            'datatype_description' => {}, 
-            'values' => {
-                'value' => $self->POTHOLE_SIZES,
-            },
+        use feature 'say';
+        say "Found category: $category\n";
+
+        my %default = (
+            variable => 'true',
+            order => '1',
+            required => 'no',
+            datatype => 'string',
+            datatype_description => 'a string',
+        );
+
+        if ($field->{datatype} || '' eq 'boolean') {
+            %default = (
+                %default,
+                datatype => 'singlevaluelist',
+                datatype_description => 'Yes or No',
+                values => { value => [ 
+                        { key => ['no'],  name => ['No'] },
+                        { key => ['yes'], name => ['Yes'] }, 
+                ] },
+            );
         }
-    ];
-    # require IO::String; require RABX;
-    # RABX::wire_wr( $fields, IO::String->new(my $extra) );
 
-    $contact->update({ extra => $fields });
+        $contact->update({ extra => [ { %default, %$field } ] });
+    };
+
+    $_update->( 'Abandoned vehicles', {
+            code => 'vehicle_registration_no',
+            description => 'Vehicle Registration number:',
+        });
+
+    $_update->( 'Dead animals', {
+            code => 'INFO_TEXT',
+            variable => 'false',
+            description => 'We do not remove small species, e.g. squirrels, rabbits, and small birds.',
+        });
+
+    $_update->( 'Flyposting', {
+            code => 'offensive',
+            description => 'Is it offensive?',
+            datatype => 'boolean', # mapped onto singlevaluelist
+        });
+
+    $_update->( 'Flytipping', {
+            code => 'size',
+            description => 'Size?',
+            datatype => 'singlevaluelist',
+            values => { value => [ 
+                    { key => ['single_item'],       name => ['Single item'] },
+                    { key => ['car_boot_load'],     name => ['Car boot load'] },
+                    { key => ['small_van_load'],    name => ['Small van load'] },
+                    { key => ['transit_van_load'],  name => ['Transit van load'] },
+                    { key => ['tipper_lorry_load'], name => ['Tipper lorry load'] },
+                    { key => ['significant_load'],  name => ['Significant load'] },
+                ] },
+        });
+
+    $_update->( 'Graffiti', {
+            code => 'offensive',
+            description => 'Is it offensive?',
+            datatype => 'boolean', # mapped onto singlevaluelist
+        });
+
+    $_update->( 'Parks and playgrounds', {
+            code => 'dangerous',
+            description => 'Is it dangerous or could cause injury?',
+            datatype => 'boolean', # mapped onto singlevaluelist
+        });
+
+    $_update->( 'Trees', {
+            code => 'dangerous',
+            description => 'Is it dangerous or could cause injury?',
+            datatype => 'boolean', # mapped onto singlevaluelist
+        });
+
 }
 
 sub get_geocoder {
