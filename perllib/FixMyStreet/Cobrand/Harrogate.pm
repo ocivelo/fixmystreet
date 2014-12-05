@@ -54,18 +54,30 @@ sub temp_update_contacts {
     my $contact_rs = $self->{c}->model('DB::Contact');
 
     my $_update = sub {
-        my ($category, $field) = @_; # we're accepting just 1 field, but supply as array [ $field ]
-        my $contact = $contact_rs->search({
-            body_id => $self->council_id,
-            category => $category,
-        })->first
-        or do {
-            warn "No such category: $category (skipping)\n";
-            return;
-        };
+        my ($category, $field, $category_details) = @_; 
+        # NB: we're accepting just 1 field, but supply as array [ $field ]
+
+        my $contact = $contact_rs->find_or_create(
+            {
+                body_id => $self->council_id,
+                category => $category,
+
+                confirmed => 1,
+                deleted => 0,
+                email => 'test@example.com',
+                editor => 'automated script',
+                note => '',
+                send_method => '',
+                whenedited => \'NOW()',
+                %{ $category_details || {} },
+            },
+            {
+                key => 'contacts_body_id_category_idx'
+            }
+        );
 
         use feature 'say';
-        say "Found category: $category\n";
+        say "Editing category: $category";
 
         my %default = (
             variable => 'true',
@@ -87,7 +99,14 @@ sub temp_update_contacts {
             );
         }
 
-        $contact->update({ extra => [ { %default, %$field } ] });
+        $contact->update({
+            extra => [ { %default, %$field } ],
+            confirmed => 1,
+            deleted => 0,
+            editor => 'automated script',
+            whenedited => \'NOW()',
+            note => 'temp_update_contacts method in Cobrand',
+        });
     };
 
     $_update->( 'Abandoned vehicles', {
