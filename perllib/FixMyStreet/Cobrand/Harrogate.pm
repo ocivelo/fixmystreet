@@ -94,13 +94,14 @@ sub temp_update_contacts {
         );
 
         if ($field->{datatype} || '' eq 'boolean') {
+            my $description = $field->{description};
             %default = (
                 %default,
                 datatype => 'singlevaluelist',
                 datatype_description => 'Yes or No',
                 values => { value => [ 
-                        { key => ['no'],  name => ['No'] },
-                        { key => ['yes'], name => ['Yes'] }, 
+                        { key => ["$description No"],  name => ['No'] },
+                        { key => ["$description Yes"], name => ['Yes'] }, 
                 ] },
             );
         }
@@ -115,8 +116,14 @@ sub temp_update_contacts {
         });
     };
 
+    # Note that we use 'detail' because template already includes this value
+    # (It would be better to make the email template smarter, but aiui the email
+    # templates are faked-up-PHP rather than a full template engine, so that's
+    # harder than it should be.  One good option might be to allow passing a TT
+    # template to send_email_cron? TODO)
+
     $_update->( 'Abandoned vehicles', {
-            code => 'vehicle_registration_no',
+            code => 'detail',
             description => 'Vehicle Registration number:',
         });
 
@@ -127,43 +134,42 @@ sub temp_update_contacts {
         });
 
     $_update->( 'Flyposting', {
-            code => 'offensive',
+            code => 'detail',
             description => 'Is it offensive?',
             datatype => 'boolean', # mapped onto singlevaluelist
         });
 
     $_update->( 'Flytipping', {
-            code => 'size',
+            code => 'detail',
             description => 'Size?',
             datatype => 'singlevaluelist',
             values => { value => [ 
-                    { key => ['single_item'],       name => ['Single item'] },
-                    { key => ['car_boot_load'],     name => ['Car boot load'] },
-                    { key => ['small_van_load'],    name => ['Small van load'] },
-                    { key => ['transit_van_load'],  name => ['Transit van load'] },
-                    { key => ['tipper_lorry_load'], name => ['Tipper lorry load'] },
-                    { key => ['significant_load'],  name => ['Significant load'] },
+                    { key => ['Single Item'],       name => ['Single item'] },
+                    { key => ['Car boot load'],     name => ['Car boot load'] },
+                    { key => ['Small van load'],    name => ['Small van load'] },
+                    { key => ['Transit van load'],  name => ['Transit van load'] },
+                    { key => ['Tipper lorry load'], name => ['Tipper lorry load'] },
+                    { key => ['Significant load'],  name => ['Significant load'] },
                 ] },
         });
 
     $_update->( 'Graffiti', {
-            code => 'offensive',
+            code => 'detail',
             description => 'Is it offensive?',
             datatype => 'boolean', # mapped onto singlevaluelist
         });
 
     $_update->( 'Parks and playgrounds', {
-            code => 'dangerous',
+            code => 'detail',
             description => 'Is it dangerous or could cause injury?',
             datatype => 'boolean', # mapped onto singlevaluelist
         });
 
     $_update->( 'Trees', {
-            code => 'dangerous',
+            code => 'detail',
             description => 'Is it dangerous or could cause injury?',
             datatype => 'boolean', # mapped onto singlevaluelist
         });
-
 }
 
 sub get_geocoder {
