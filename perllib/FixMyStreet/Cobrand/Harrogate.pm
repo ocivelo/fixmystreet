@@ -13,9 +13,15 @@ sub is_two_tier { return 1; } # with North Yorkshire CC 2235
 sub disambiguate_location {
     my $self    = shift;
     my $string  = shift;
+
+    my $town = 'Harrogate';
+
+    # as it's the requested example location, try to avoid a disambiguation page
+    $town .= ', HG1 1DH' if $string =~ /^\s*king'?s\s+r(?:oa)?d\s*(?:,\s*har\w+\s*)?$/i;
+
     return {
         %{ $self->SUPER::disambiguate_location() },
-        town   => 'Harrogate',
+        town   => $town,
         centre => '54.0671557690306,-1.59581319536637',
         span   => '0.370193897090822,0.829517054931808',
         bounds => [ 53.8914112467619, -2.00450542308575, 54.2616051438527, -1.17498836815394 ],
@@ -23,7 +29,7 @@ sub disambiguate_location {
 }
 
 sub example_places {
-    return ( 'LS21 2HX', 'Smithy Lane, Denton' );
+    return ( 'HG1 2SG', "King's Road" );
 }
 
 sub enter_postcode_text {
