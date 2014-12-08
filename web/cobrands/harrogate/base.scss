@@ -11,10 +11,11 @@ body.frontpage #site-logo,
 #site-logo
 {
     display: block;
-    background: url("/cobrands/harrogate/HBCLogo-mobile.png") 0 0 no-repeat;
     margin: 2px;
     padding-left: 10px;
     position: static;
+
+    background: url("/cobrands/harrogate/HBCLogo-mobile.png") 0 0 no-repeat;
     width: 106px;
     height: 37px;
 }
@@ -22,12 +23,13 @@ body.frontpage #site-logo,
 #main-nav ul#main-menu li {
 
     // blue button background, darker if selected
-    background: $primary;
-    &.menu-item-selected { background: $primary_dark; }
-
-    @include border-radius(1em);
-    margin: 0.25em;
-    border: solid 1px black;
+    background: #ededed;
+    &.menu-item-selected {
+        background: $primary;
+        span {
+            color: #fff;
+        }
+    }
 
     span {
         color: $nav_fg;
@@ -49,4 +51,8 @@ label[for=form_INFO_TEXT] {
     background: yellow;
     border: solid 1px black;
     padding: 1em;
+}
+
+#site-header {
+    background: none;
 }
