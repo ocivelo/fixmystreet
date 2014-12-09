@@ -3,6 +3,7 @@ use base 'FixMyStreet::Cobrand::UKCouncils';
 
 use strict;
 use warnings;
+use feature 'say';
 
 sub council_id { return 2407; }
 sub council_area { return 'Harrogate'; }
@@ -54,11 +55,16 @@ Can run with a script or command line like:
 
 =cut
 
+sub temp_email_to_update {
+    return 'test@example.com';
+}
+
 sub temp_update_contacts {
     my $self = shift;
 
     my $contact_rs = $self->{c}->model('DB::Contact');
 
+    my $email = $self->temp_email_to_update;
     my $_update = sub {
         my ($category, $field, $category_details) = @_; 
         # NB: we're accepting just 1 field, but supply as array [ $field ]
@@ -70,7 +76,7 @@ sub temp_update_contacts {
 
                 confirmed => 1,
                 deleted => 0,
-                email => 'test@example.com',
+                email => $email,
                 editor => 'automated script',
                 note => '',
                 send_method => '',
@@ -82,7 +88,6 @@ sub temp_update_contacts {
             }
         );
 
-        use feature 'say';
         say "Editing category: $category";
 
         my %default = (
@@ -112,7 +117,7 @@ sub temp_update_contacts {
             deleted => 0,
             editor => 'automated script',
             whenedited => \'NOW()',
-            note => 'temp_update_contacts method in Cobrand',
+            note => 'Edited by script as per requirements Dec 2014',
         });
     };
 
@@ -170,10 +175,62 @@ sub temp_update_contacts {
             description => 'Is it dangerous or could cause injury?',
             datatype => 'boolean', # mapped onto singlevaluelist
         });
+
+    # also ensure that the following categories are created:
+    for my $category (
+        'Car parking',
+        'Dog and litter bins',
+        'Dog fouling',
+        'Other',
+        'Rubbish (refuse and recycling)',
+        'Street cleaning',
+        'Street lighting',
+        'Street nameplates',
+        # NYCC
+        # 'Bus stops',
+        # 'Pavements and footpaths',
+        # ... TODO
+    ) {
+        say "Creating $category if required";
+        my $contact = $contact_rs->find_or_create(
+            {
+                body_id => $self->council_id,
+                category => $category,
+                confirmed => 1,
+                deleted => 0,
+                email => $email,
+                editor => 'automated script',
+                note => 'Created by script as per requirements Dec 2014',
+                send_method => '',
+                whenedited => \'NOW()',
+            }
+        );
+    }
+
+    my @to_delete = (
+        'Parks/landscapes', # delete in favour of to parks and playgrounds
+        'Public toilets',   # as no longer in specs
+    );
+    say sprintf "Deleting: %s (if present)", join ',' => @to_delete;
+    $contact_rs->search({
+        body_id => $self->council_id,
+        category => \@to_delete,
+        deleted => 0
+    })->update({
+        deleted => 1,
+        editor => 'automated script',
+        whenedited => \'NOW()',
+        note => 'Deleted by script as per requirements Dec 2014',
+    });
 }
 
-sub get_geocoder {
+#sub get_geocoder {
     # return 'OSM'; # default of Bing gives poor results for ESCC, uncomment this if relevant to Harrogate?
+#}
+
+sub contact_email {
+    my $self = shift;
+    return join( '@', 'customerservices', 'harrogate.gov.uk' );
 }
 
 1;
