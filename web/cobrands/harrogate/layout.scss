@@ -26,8 +26,29 @@
     }
 }
 
-body.frontpage #main-nav {
+body.frontpage #main-nav,
+body.authpage #main-nav,
+body.twothirdswidthpage #main-nav,
+body.fullwidthpage #main-nav,
+{
     margin-top: 2.6em;
+}
+
+body.fullwidthpage .container .content,
+body.twothirdswidthpage .container .content {
+    margin: 0;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+body.twothirdswidthpage .content aside {
+    margin-top: 2em;
+    @include box-shadow(none);
+}
+
+
+body.twothirdswidthpage form.full-width {
+    margin: 0;
 }
 
 body.mappage #main-nav {
@@ -83,6 +104,7 @@ body.mappage .nav-wrapper .nav-wrapper-2 {
     #front-main-container {
         background: $primary;
         padding: 2em 0;
+        @include border-radius(12px);
 
         #postcode-intro {
             margin: 0 2em;
@@ -110,4 +132,15 @@ body.mappage .content {
 
 #fms_pan_zoom {
     top: 8em;
+}
+
+body.twothirdswidthpage .container .content footer,
+body.fullwidthpage .container .content footer
+{
+    .tablewrapper {
+        background: $primary;
+        @include border-radius(12px);
+        margin-bottom: 2em;
+
+    }
 }
