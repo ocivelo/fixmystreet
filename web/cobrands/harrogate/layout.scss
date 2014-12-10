@@ -145,6 +145,7 @@ body.twothirdswidthpage .container .content footer,
 body.fullwidthpage .container .content footer
 {
     .tablewrapper {
+        width: 100%;
         background: $primary;
         @include border-radius(12px);
         margin-bottom: 2em;
