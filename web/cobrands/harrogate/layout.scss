@@ -24,6 +24,12 @@
     .ie6 body.mappage #site-logo {
         top: 0.5em;
     }
+    body.twothirdswidthpage .container .content footer .tablewrapper a:link,
+    body.twothirdswidthpage .container .content footer .tablewrapper a:visited,
+    body.fullwidthpage .container .content footer .tablewrapper a:link,
+    body.fullwidthpage .container .content footer .tablewrapper a:visited {
+        color: white;
+    }
 }
 
 body.frontpage #main-nav,
