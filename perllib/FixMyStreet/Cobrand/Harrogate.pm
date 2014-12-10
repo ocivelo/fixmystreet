@@ -105,8 +105,8 @@ sub temp_update_contacts {
                 datatype => 'singlevaluelist',
                 datatype_description => 'Yes or No',
                 values => { value => [ 
-                        { key => ["$description No"],  name => ['No'] },
-                        { key => ["$description Yes"], name => ['Yes'] }, 
+                        { key => ['No'],  name => ['No'] },
+                        { key => ['Yes'], name => ['Yes'] }, 
                 ] },
             );
         }
@@ -128,7 +128,7 @@ sub temp_update_contacts {
     # template to send_email_cron? TODO)
 
     $_update->( 'Abandoned vehicles', {
-            code => 'detail',
+            code => 'registration',
             description => 'Vehicle Registration number:',
         });
 
@@ -139,13 +139,13 @@ sub temp_update_contacts {
         });
 
     $_update->( 'Flyposting', {
-            code => 'detail',
+            code => 'offensive',
             description => 'Is it offensive?',
             datatype => 'boolean', # mapped onto singlevaluelist
         });
 
     $_update->( 'Flytipping', {
-            code => 'detail',
+            code => 'size',
             description => 'Size?',
             datatype => 'singlevaluelist',
             values => { value => [ 
@@ -159,13 +159,13 @@ sub temp_update_contacts {
         });
 
     $_update->( 'Graffiti', {
-            code => 'detail',
+            code => 'offensive',
             description => 'Is it offensive?',
             datatype => 'boolean', # mapped onto singlevaluelist
         });
 
     $_update->( 'Parks and playgrounds', {
-            code => 'detail',
+            code => 'dangerous',
             description => 'Is it dangerous or could cause injury?',
             datatype => 'boolean', # mapped onto singlevaluelist
         });
@@ -186,10 +186,6 @@ sub temp_update_contacts {
         'Street cleaning',
         'Street lighting',
         'Street nameplates',
-        # NYCC
-        # 'Bus stops',
-        # 'Pavements and footpaths',
-        # ... TODO
     ) {
         say "Creating $category if required";
         my $contact = $contact_rs->find_or_create(
@@ -231,6 +227,25 @@ sub temp_update_contacts {
 sub contact_email {
     my $self = shift;
     return join( '@', 'customerservices', 'harrogate.gov.uk' );
+}
+
+sub process_additional_metadata_for_email {
+    my ($self, $problem, $h) = @_;
+
+    my $additional = '';
+    if (my $extra = $problem->extra) {
+        $additional = join "\n\n", map {
+            if ($_->{name} eq 'INFO_TEXT') {
+                ();
+            }
+            else {
+                sprintf '%s: %s', $_->{description}, $_->{value};
+            }
+        } @$extra;
+        $additional = "\n\n$additional" if $additional;
+    }
+
+    $h->{additional_information} = $additional;
 }
 
 1;
